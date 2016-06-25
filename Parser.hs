@@ -4,6 +4,7 @@ module Lisp.Parser (
   sfile,
   s,
   depth,
+  symbols,
   module Text.Parsec
 ) where
 
@@ -21,6 +22,15 @@ data S = Symbol String
        | Lambda [String] S
 
 data A = String := S
+
+symbols :: S -> [String]
+symbols (Symbol s) = pure s
+symbols (Number x) = []
+symbols (Quote s) = symbols s
+symbols (Rose ss) = ss >>= symbols
+symbols F = []
+symbols T = []
+symbols (Lambda _ _) = []
 
 depth :: S -> Integer
 depth (Symbol _) = 0
@@ -92,7 +102,7 @@ s :: ParsecT String () Identity S
 s = sbool <|> snumber <|> symbol <|> squote <|> slambda <|> slist
 
 a :: ParsecT String () Identity A
-a = do 
+a = do
   is <- many1 (whitespace *> identifier <* whitespace)
   whitespace *> char '='
   case is of

@@ -1,6 +1,7 @@
 module Lisp.Evaluator (
   evaluate,
-  runLisp
+  runLisp,
+  getIncludes
 ) where
 
 -- Maybe works
@@ -47,6 +48,9 @@ evaluate context (Rose es) = case es of
 getMain :: [A] -> [A]
 getMain = filter (\ (n := _) -> n == "main")
 
+getIncludes :: [A] -> [A]
+getIncludes = filter (\ (n := _) -> n == "include")
+
 repeatDefs :: [A] -> [String]
 repeatDefs [] = []
 repeatDefs ((n := _) : rest) = case filter (\(m := _) -> n == m) rest of
@@ -57,5 +61,5 @@ runLisp :: [A] -> Either String S
 runLisp context = case repeatDefs context of
   [] -> case getMain context of
       [("main" := main)] -> evaluate context main
-      _ -> Left "No unique main file!\n"
+      _ -> Left "No unique main function!\n"
   xs -> Left ("Repeat definitions: " ++ show xs ++ "\n")
