@@ -8,7 +8,7 @@ Lispish language... Here are the facts.
 
 3. You can include other files via "include = (...)"
 
-4. Numbers are encoded as Church numerals
+4. Numbers and booleans are encoded in the lambda calculus.
 
 5. It is bound to be incredibly slow on trivial programs.
 
