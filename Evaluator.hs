@@ -39,6 +39,7 @@ evaluate context (Rose es) = case es of
           GT -> do let (vs'', vs''') = splitAt xslength vs
                    res <- evaluate (zipWith (:=) vs'' xs' ++ context) exp
                    pure $ Lambda vs''' res
+        evaluate (zipWith (:=) vs xs' ++ context) exp
       _ -> do
         xs' <- mapM (evaluate context) xs
         return (Rose (f' : xs'))
