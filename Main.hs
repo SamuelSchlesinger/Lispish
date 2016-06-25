@@ -9,12 +9,18 @@ preprocess path = do
     Left err -> print err >> return []
     Right defs -> do let includes = map (\(_ := v) -> v) $ getIncludes defs
                      let syms = includes >>= symbols
-                     included <- mapM preprocess syms 
+                     included <- mapM preprocess syms
                      return (defs ++ concat included)
 
 main = do
   (f:_) <- getArgs
-  defs <- preprocess f 
+{-  str <- readFile f
+  case parse sfile f str of
+    Left err -> print err
+    Right defs -> case runLisp defs of
+      Left err -> print err
+      Right res -> print res >> (print $ depth res)-}
+  defs <- preprocess f
   case runLisp defs of
     Left err -> print err
     Right res -> print res >> (print $ depth res)

@@ -4,16 +4,14 @@ module Lisp.Evaluator (
   getIncludes
 ) where
 
--- Maybe works
-
 import Data.List
 import Lisp.Parser (S(..), A(..))
 
+-- | Given a context (a list of top level definitions), and an expression,
+--   evaluate the expression as much as you can.
 evaluate :: [A] -> S -> Either String S 
 
-evaluate context T = return T
-evaluate context F = return F
-evaluate context (Number n) = return $ Number n
+-- | #t and #f are in normal form already
 evaluate context (Symbol v) = case find (\(v' :=  x) -> v' == v) context of
                                 Nothing -> Right $ Symbol v
                                 Just (_ := x) -> Right x
@@ -38,9 +36,9 @@ evaluate context (Rose es) = case es of
                    evaluate context' $ Rose (res:xs''')
           EQ -> evaluate (zipWith (:=) vs xs' ++ context) exp
           GT -> do let (vs'', vs''') = splitAt xslength vs
-                   res <- evaluate (zipWith (:=) vs'' xs' ++ context) exp
-                   pure $ Lambda vs''' res
-        evaluate (zipWith (:=) vs xs' ++ context) exp
+                   let context' = zipWith (:=) vs xs' ++ context
+                   res <- evaluate context' exp
+                   evaluate context' $ Lambda vs''' res
       _ -> do
         xs' <- mapM (evaluate context) xs
         return (Rose (f' : xs'))

@@ -1,8 +1,17 @@
-Lispish language
+Lispish language... Here are the facts.
 
-Programs consist of a series of top level definitions.
+0. There is no specification
 
-The main definition is the one which will be evaluated
-when the program is run.
+1. Programs consist of a series of top level definitions
 
-There's a funky hack that will automatically curry things for you. Dunno if this is a good call or what.
+2. There's a funky hack that will automatically curry things for you
+
+3. You can include other files via "include = (...)"
+
+4. Numbers are encoded as Church numerals
+
+5. It is bound to be incredibly slow on trivial programs.
+
+6. I'm having a lot of fun playing with this.
+
+If you want an example you can look in the Prelude.

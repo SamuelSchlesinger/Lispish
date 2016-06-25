@@ -6,12 +6,14 @@ flip f = \x.\y.(f y x)
 
 succ n = \f.\x.(f ((n f) x))
 
-+ m n = \f x. ((m f) ((n f) x))
++ = \m.\n. \f x. ((m f) ((n f) x))
 
-* m n = \f.(m (n f))
+* = \m.\n. \f.(m (n f))
 
-^ m n = (n m)
+^ = \m.\n. (n m)
 
-includes ( 
+true = \x.\y. x
 
-main = (+ 4 2)
+false = \x.\y. y
+
+if s a b = (s a b)

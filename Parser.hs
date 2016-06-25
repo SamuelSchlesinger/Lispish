@@ -14,31 +14,22 @@ import Data.Char
 import Text.Parsec.Char
 
 data S = Symbol String
-       | Number Integer
        | Quote S
        | Rose [S]
-       | F
-       | T
        | Lambda [String] S
 
 data A = String := S
 
 symbols :: S -> [String]
 symbols (Symbol s) = pure s
-symbols (Number x) = []
 symbols (Quote s) = symbols s
 symbols (Rose ss) = ss >>= symbols
-symbols F = []
-symbols T = []
 symbols (Lambda _ _) = []
 
 depth :: S -> Integer
 depth (Symbol _) = 0
-depth (Number _) = 0
 depth (Quote s) = depth s
 depth (Rose xs) = 1 + (maximum $ map depth xs)
-depth F = 0
-depth T = 0
 depth (Lambda _ e) = depth e
 
 encode :: Integer -> S
@@ -62,7 +53,7 @@ whitespace :: ParsecT String () Identity String
 whitespace = many (oneOf " \n\t")
 
 symbol :: ParsecT String () Identity S
-symbol = do
+symbol = sliteral <|> do
   i <- identifier
   pure $ Symbol i
 
@@ -95,11 +86,15 @@ squote = do
   exp <- s
   return (Quote exp)
 
-sbool :: ParsecT String () Identity S
-sbool = char '#' *> ((char 't' *> pure T) <|> (char 'f' *> pure F))
+sliteral :: ParsecT String () Identity S
+sliteral = do 
+  char '\"'
+  str <- many (noneOf "\"")
+  char '\"'
+  return (Symbol str)
 
 s :: ParsecT String () Identity S
-s = sbool <|> snumber <|> symbol <|> squote <|> slambda <|> slist
+s = snumber <|> symbol <|> squote <|> slambda <|> slist
 
 a :: ParsecT String () Identity A
 a = do
@@ -118,15 +113,12 @@ sfile = many (whitespace *> a <* whitespace)
 
 instance Show S where
   show (Symbol str) = str
-  show (Number num) = show num
   show (Rose s) = case ("(" ++ (do
     a <- s
     ' ' : show a) ++ ")") of
       "()" -> "()"
       '(':' ':xs -> '(':xs
       x -> x
-  show F = "#f"
-  show T = "#t"
   show (Quote s) = '\'':show s
   show (Lambda vars exp) =
     let vs = vars >>= (' ':) in
